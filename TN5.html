@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Hệ thống hỗ trợ trẻ em đọc nói</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #555;
+            font-size: 18px;
+        }
+
+        .word-box {
+            background: #fff3cd;
+            border-radius: 20px;
+            padding: 35px 20px;
+            margin: 25px 0;
+            border: 3px solid #ffe08a;
+        }
+
+        #sentence {
+            font-size: 38px;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .instruction {
+            background: #e8f7ff;
+            padding: 15px;
+            border-radius: 15px;
+            color: #246;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            border: none;
+            border-radius: 15px;
+            padding: 15px 22px;
+            margin: 7px;
+            font-size: 19px;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .listen {
+            background: #3498db;
+        }
+
+        .speak {
+            background: #2ecc71;
+        }
+
+        .repeat {
+            background: #9b59b6;
+        }
+
+        .next {
+            background: #f39c12;
+        }
+
+        .voice-box {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        select {
+            font-size: 17px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        #heard {
+            color: #555;
+            font-size: 20px;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+
+        #result {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 15px;
+            background: #f8f9fa;
+        }
+
+        .progress {
+            margin-top: 20px;
+            color: #777;
+            font-size: 17px;
+        }
+
+        #status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f1f1f1;
+            color: #555;
+            font-size: 15px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            #sentence {
+                font-size: 30px;
+            }
+
+            button {
+                font-size: 16px;
+                padding: 13px 15px;
+                margin: 5px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌈 Bé học đọc và nói</h1>
+
+    <p class="description">
+        Hãy nghe câu mẫu thật rõ, sau đó bé đọc lại nhé!
+    </p>
+
+    <div class="instruction">
+
+        👂 <b>Bước 1:</b> Bấm "Nghe mẫu"<br>
+
+        🎤 <b>Bước 2:</b> Bấm "Bé đọc" và đọc thật rõ<br>
+
+        ⭐ <b>Bước 3:</b> Xem kết quả
+
+    </div>
+
+
+    <div class="word-box">
+
+        <div id="sentence">
+            Con mèo đang ngủ.
+        </div>
+
+    </div>
+
+
+    <div class="voice-box">
+
+        <label for="voiceSelect">
+
+            🔊 Chọn giọng đọc:
+
+        </label>
+
+        <select id="voiceSelect">
+
+            <option value="female">
+                👩 Giọng nữ
+            </option>
+
+            <option value="male">
+                👨 Giọng nam
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button
+            class="listen"
+            onclick="readSentence()"
+        >
+            🔊 Nghe mẫu
+        </button>
+
+
+        <button
+            class="repeat"
+            onclick="readSentence()"
+        >
+            🔁 Nghe lại
+        </button>
+
+
+        <button
+            class="speak"
+            id="speakButton"
+            onclick="startSpeaking()"
+        >
+            🎤 Bé đọc
+        </button>
+
+
+        <button
+            class="next"
+            onclick="nextSentence()"
+        >
+            ➡️ Câu tiếp theo
+        </button>
+
+    </div>
+
+
+    <div id="heard">
+
+        Bé đã nói: ...
+
+    </div>
+
+
+    <div id="result">
+
+        ⭐ Điểm: Chưa có
+
+    </div>
+
+
+    <div id="status">
+
+        📱 Đang chuẩn bị hệ thống...
+
+    </div>
+
+
+    <div class="progress">
+
+        📖 Câu
+
+        <span id="currentNumber">
+            1
+        </span>
+
+        /
+
+        <span id="totalNumber">
+            38
+        </span>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DANH SÁCH CÂU
+===================================================== */
+
+const sentences = [
+
+    "Con mèo đang ngủ.",
+    "Bé đang đọc sách.",
+    "Mẹ nấu cơm.",
+    "Con chó chạy rất nhanh.",
+    "Hôm nay trời rất đẹp.",
+    "Em bé đang chơi bóng.",
+    "Ông đang tưới cây.",
+    "Bố đưa em đi học.",
+
+    "Chào buổi sáng!",
+    "Chào bạn!",
+    "Bạn tên là gì?",
+    "Mình tên là An.",
+    "Bạn có khỏe không?",
+    "Mình khỏe, cảm ơn bạn.",
+    "Hôm nay bạn đi đâu?",
+    "Mình đi học.",
+    "Bạn đang làm gì?",
+    "Mình đang chơi đồ chơi.",
+    "Mẹ ơi, con đói rồi.",
+    "Con muốn uống nước.",
+    "Con muốn ăn cơm.",
+    "Con cảm ơn mẹ.",
+    "Con xin lỗi mẹ.",
+    "Bố ơi, giúp con với!",
+    "Con có thể chơi không?",
+    "Con đã làm bài xong rồi.",
+    "Con chuẩn bị đi học.",
+    "Con nhớ mang theo sách.",
+    "Hãy đánh răng trước khi đi ngủ.",
+    "Con đi ngủ nhé!",
+    "Chúc bạn ngủ ngon!",
+    "Ngày mai chúng ta gặp lại.",
+    "Bạn có muốn chơi cùng mình không?",
+    "Mình rất thích chơi với bạn.",
+    "Bạn hãy chờ mình một chút.",
+    "Chúng ta cùng nhau dọn đồ chơi.",
+    "Cảm ơn bạn đã giúp mình.",
+    "Mình rất vui hôm nay."
+
+];
+
+
+/* =====================================================
+   BIẾN
+===================================================== */
+
+let currentIndex = 0;
+
+let voices = [];
+
+let recognition = null;
+
+let isListening = false;
+
+
+/* =====================================================
+   HIỂN THỊ TỔNG SỐ CÂU
+===================================================== */
+
+document.getElementById("totalNumber").innerText =
+    sentences.length;
+
+
+/* =====================================================
+   HIỂN THỊ TRẠNG THÁI
+===================================================== */
+
+function setStatus(message) {
+
+    document.getElementById("status").innerText =
+        message;
+
+}
+
+
+/* =====================================================
+   TẢI GIỌNG
+===================================================== */
+
+function loadVoices() {
+
+    voices =
+        window.speechSynthesis.getVoices();
+
+
+    console.log(
+        "Danh sách giọng:",
+        voices
+    );
+
+}
+
+
+if ("speechSynthesis" in window) {
+
+    window.speechSynthesis.onvoiceschanged =
+        loadVoices;
+
+    loadVoices();
+
+    setTimeout(loadVoices, 500);
+
+    setTimeout(loadVoices, 1500);
+
+}
+
+
+/* =====================================================
+   TÌM GIỌNG TIẾNG VIỆT
+===================================================== */
+
+function getVietnameseVoice() {
+
+    const vietnameseVoices =
+        voices.filter(function(voice) {
+
+            const lang =
+                (voice.lang || "")
+                    .toLowerCase();
+
+            return (
+                lang === "vi-vn" ||
+                lang === "vi" ||
+                lang.startsWith("vi-")
+            );
+
+        });
+
+
+    if (vietnameseVoices.length > 0) {
+
+        return vietnameseVoices[0];
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   ĐỌC CÂU MẪU
+===================================================== */
+
+function readSentence() {
+
+    if (!("speechSynthesis" in window)) {
+
+        setStatus(
+            "❌ Trình duyệt không hỗ trợ đọc văn bản."
+        );
+
+        return;
+
+    }
+
+
+    window.speechSynthesis.cancel();
+
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            sentences[currentIndex]
+        );
+
+
+    /*
+       Luôn yêu cầu tiếng Việt
+    */
+
+    speech.lang = "vi-VN";
+
+
+    /*
+       Đọc chậm và rõ
+    */
+
+    speech.rate = 0.6;
+
+    speech.pitch = 1.0;
+
+    speech.volume = 1.0;
+
+
+    const vietnameseVoice =
+        getVietnameseVoice();
+
+
+    /*
+       Nếu có giọng Việt thì dùng.
+
+       Nếu không có:
+       Vẫn thử đọc bằng engine
+       của thiết bị thay vì chặn.
+    */
+
+    if (vietnameseVoice) {
+
+        speech.voice =
+            vietnameseVoice;
+
+
+        setStatus(
+            "🔊 Đang sử dụng giọng tiếng Việt."
+        );
+
+    }
+
+    else {
+
+        setStatus(
+            "⚠️ Không tìm thấy giọng vi-VN. Đang thử giọng mặc định của thiết bị."
+        );
+
+    }
+
+
+    speech.onerror =
+        function(event) {
+
+            console.log(
+                "Speech error:",
+                event
+            );
+
+            setStatus(
+                "❌ Không thể đọc câu này trên thiết bị."
+            );
+
+        };
+
+
+    /*
+       Trên điện thoại cần gọi trực tiếp
+       từ thao tác bấm nút.
+    */
+
+    window.speechSynthesis.speak(
+        speech
+    );
+
+}
+
+
+/* =====================================================
+   KIỂM TRA SPEECH RECOGNITION
+===================================================== */
+
+function getSpeechRecognition() {
+
+    return (
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition ||
+        null
+    );
+
+}
+
+
+/* =====================================================
+   KIỂM TRA QUYỀN MICROPHONE
+===================================================== */
+
+async function checkMicrophonePermission() {
+
+    /*
+       Không phải trình duyệt nào cũng
+       hỗ trợ Permissions API.
+    */
+
+    if (
+        !navigator.permissions ||
+        !navigator.permissions.query
+    ) {
+
+        return "unknown";
+
+    }
+
+
+    try {
+
+        const result =
+            await navigator.permissions.query({
+
+                name: "microphone"
+
+            });
+
+
+        return result.state;
+
+    }
+
+    catch (error) {
+
+        return "unknown";
+
+    }
+
+}
+
+
+/* =====================================================
+   BẮT ĐẦU BÉ ĐỌC
+===================================================== */
+
+async function startSpeaking() {
+
+    const SpeechRecognition =
+        getSpeechRecognition();
+
+
+    if (!SpeechRecognition) {
+
+        document.getElementById(
+            "heard"
+        ).innerText =
+            "❌ Trình duyệt này không hỗ trợ nhận diện giọng nói.";
+
+
+        setStatus(
+            "📱 Hãy thử mở web bằng Google Chrome."
+        );
+
+        return;
+
+    }
+
+
+    if (isListening) {
+
+        return;
+
+    }
+
+
+    /*
+       Kiểm tra HTTPS.
+
+       localhost cũng được phép.
+    */
+
+    if (
+        location.protocol !== "https:" &&
+        location.hostname !== "localhost"
+    ) {
+
+        setStatus(
+            "⚠️ Microphone có thể không hoạt động vì web chưa chạy bằng HTTPS."
+        );
+
+    }
+
+
+    /*
+       Kiểm tra quyền hiện tại
+    */
+
+    const permission =
+        await checkMicrophonePermission();
+
+
+    if (permission === "denied") {
+
+        document.getElementById(
+            "heard"
+        ).innerText =
+            "🔒 Microphone đang bị chặn trong trình duyệt.";
+
+
+        setStatus(
+            "Vào phần thông tin trang web → Quyền → Microphone → Cho phép."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Tạo recognition mới
+    */
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "vi-VN";
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.maxAlternatives =
+        1;
+
+
+    recognition.onstart =
+        function() {
+
+            isListening =
+                true;
+
+
+            document.getElementById(
+                "heard"
+            ).innerText =
+                "🎤 Đang nghe... Bé hãy đọc rõ nhé!";
+
+
+            document.getElementById(
+                "result"
+            ).innerText =
+                "⏳ Đang nhận diện...";
+
+
+            document.getElementById(
+                "speakButton"
+            ).innerText =
+                "🎤 Đang nghe...";
+
+
+            setStatus(
+                "🎙️ Microphone đang hoạt động."
+            );
+
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+            const speechText =
+                event.results[0][0].transcript;
+
+
+            document.getElementById(
+                "heard"
+            ).innerText =
+                "🗣️ Bé đã nói: " +
+                speechText;
+
+
+            calculateScore(
+                speechText
+            );
+
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.log(
+                "Speech recognition error:",
+                event.error
+            );
+
+
+            let message =
+                "❌ Không thể nhận diện giọng nói.";
+
+
+            if (
+                event.error === "not-allowed"
+            ) {
+
+                message =
+                    "🔒 Trình duyệt chưa được phép dùng microphone.";
+
+            }
+
+            else if (
+                event.error ===
+                "service-not-allowed"
+            ) {
+
+                message =
+                    "🔒 Dịch vụ nhận diện giọng nói đang bị chặn.";
+
+            }
+
+            else if (
+                event.error ===
+                "no-speech"
+            ) {
+
+                message =
+                    "🎤 Không nghe thấy giọng nói. Hãy thử nói to và rõ hơn.";
+
+            }
+
+            else if (
+                event.error ===
+                "network"
+            ) {
+
+                message =
+                    "🌐 Lỗi mạng. Nhận diện giọng nói cần kết nối Internet.";
+
+            }
+
+            else if (
+                event.error ===
+                "audio-capture"
+            ) {
+
+                message =
+                    "🎤 Không tìm thấy microphone trên thiết bị.";
+
+            }
+
+
+            document.getElementById(
+                "heard"
+            ).innerText =
+                message;
+
+
+            document.getElementById(
+                "result"
+            ).innerText =
+                "⭐ Điểm: Chưa có";
+
+
+            setStatus(
+                "Lỗi: " +
+                event.error
+            );
+
+        };
+
+
+    recognition.onend =
+        function() {
+
+            isListening =
+                false;
+
+
+            recognition =
+                null;
+
+
+            document.getElementById(
+                "speakButton"
+            ).innerText =
+                "🎤 Bé đọc";
+
+        };
+
+
+    /*
+       Bắt đầu nhận diện
+    */
+
+    try {
+
+        recognition.start();
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Start error:",
+            error
+        );
+
+
+        isListening =
+            false;
+
+
+        document.getElementById(
+            "heard"
+        ).innerText =
+            "❌ Không thể khởi động microphone.";
+
+
+        document.getElementById(
+            "speakButton"
+        ).innerText =
+            "🎤 Bé đọc";
+
+    }
+
+}
+
+
+/* =====================================================
+   CHUẨN HÓA VĂN BẢN
+===================================================== */
+
+function normalizeText(text) {
+
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /đ/g,
+            "d"
+        )
+        .replace(
+            /[.,!?;:"'()]/g,
+            ""
+        )
+        .trim();
+
+}
+
+
+/* =====================================================
+   TÍNH ĐIỂM
+===================================================== */
+
+function calculateScore(spokenText) {
+
+    const target =
+        normalizeText(
+            sentences[currentIndex]
+        );
+
+
+    const spoken =
+        normalizeText(
+            spokenText
+        );
+
+
+    const targetWords =
+        target.split(/\s+/);
+
+
+    const spokenWords =
+        spoken.split(/\s+/);
+
+
+    let correct =
+        0;
+
+
+    targetWords.forEach(
+        function(word) {
+
+            if (
+                spokenWords.includes(word)
+            ) {
+
+                correct++;
+
+            }
+
+        }
+    );
+
+
+    let score =
+        Math.round(
+
+            (
+                correct /
+                targetWords.length
+            ) * 100
+
+        );
+
+
+    score =
+        Math.min(
+            score,
+            100
+        );
+
+
+    let message =
+        "";
+
+
+    if (score >= 90) {
+
+        message =
+            "🌟 Tuyệt vời! Bé đọc rất rõ!";
+
+    }
+
+    else if (score >= 70) {
+
+        message =
+            "👏 Rất tốt! Bé cố gắng thêm một chút nhé!";
+
+    }
+
+    else if (score >= 50) {
+
+        message =
+            "😊 Khá tốt! Bé hãy đọc lại chậm hơn nhé.";
+
+    }
+
+    else {
+
+        message =
+            "💪 Không sao! Bé nghe mẫu rồi thử lại nhé.";
+
+    }
+
+
+    document.getElementById(
+        "result"
+    ).innerText =
+
+        "⭐ Điểm: " +
+        score +
+        "/100 - " +
+        message;
+
+}
+
+
+/* =====================================================
+   CÂU TIẾP THEO
+===================================================== */
+
+function nextSentence() {
+
+    if ("speechSynthesis" in window) {
+
+        window.speechSynthesis.cancel();
+
+    }
+
+
+    if (recognition) {
+
+        try {
+
+            recognition.abort();
+
+        }
+
+        catch (error) {}
+
+
+        recognition =
+            null;
+
+
+        isListening =
+            false;
+
+    }
+
+
+    currentIndex++;
+
+
+    if (
+        currentIndex >=
+        sentences.length
+    ) {
+
+        currentIndex =
+            0;
+
+    }
+
+
+    document.getElementById(
+        "sentence"
+    ).innerText =
+        sentences[currentIndex];
+
+
+    document.getElementById(
+        "currentNumber"
+    ).innerText =
+        currentIndex + 1;
+
+
+    document.getElementById(
+        "heard"
+    ).innerText =
+        "Bé đã nói: ...";
+
+
+    document.getElementById(
+        "result"
+    ).innerText =
+        "⭐ Điểm: Chưa có";
+
+
+    setStatus(
+        "📖 Đã chuyển sang câu mới."
+    );
+
+}
+
+
+/* =====================================================
+   KHỞI ĐỘNG
+===================================================== */
+
+if (
+    location.protocol === "https:" ||
+    location.hostname === "localhost"
+) {
+
+    setStatus(
+        "✅ Web đang chạy trong môi trường phù hợp."
+    );
+
+}
+
+else {
+
+    setStatus(
+        "⚠️ Nếu microphone không hoạt động, hãy đưa web lên HTTPS."
+    );
+
+}
+
+</script>
+
+</body>
+</html>
